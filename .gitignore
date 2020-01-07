@@ -2,7 +2,7 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/src/CoverletSonarQubeDocker/.vs
-/src/CoverletSonarQubeDocker/CoverletSonarQubeDocker/bin
-/src/CoverletSonarQubeDocker/CoverletSonarQubeDocker/obj
+/src/CoverletSonarQubeDocker/.vs/
+/src/CoverletSonarQubeDocker/CoverletSonarQubeDocker/bin/
+/src/CoverletSonarQubeDocker/CoverletSonarQubeDocker/obj/
 /src/CoverletSonarQubeDocker/CoverletSonarQubeDocker/CoverletSonarQubeDocker.csproj.user
