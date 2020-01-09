@@ -1,0 +1,45 @@
+
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
+COPY src/. /src
+WORKDIR /src
+RUN dotnet publish -c release -f netcoreapp2.2 -nr:false -m:1 -o /app
+
+# test application -- see: dotnet-docker-unit-testing.md
+FROM build AS testrunner
+COPY src/. /src
+WORKDIR /src
+
+FROM build AS sonar
+ARG projectName=newproject
+WORKDIR /src
+RUN apt-get update && apt-get install -y \
+   openjdk-8-jre-headless
+
+RUN apt-get clean
+COPY . .
+RUN dotnet tool install --global dotnet-sonarscanner
+ENV PATH="${PATH}:/root/.dotnet/tools"
+RUN dotnet sonarscanner begin /n:$projectName /k:$projectName \
+    /d:sonar.host.url=http://146.122.190.170:9000 \ 
+	/d:sonar.cs.opencover.reportsPaths="CoverageResults/coverage.opencover.xml" \ 
+#	/d:sonar.cs.vstest.reportsPaths="/src/**/TestResults/testresult.xml" \ 
+	/d:sonar.scm.disabled=true /d:sonar.coverage.dtdVerification=true \ 
+	/d:sonar.coverage.exclusions="**/tests/**/*.cs,*testresult*.xml" \ 
+	/d:sonar.test.exclusions="**/tests/**/*.cs,*testresult*.xml"
+RUN dotnet test -c release -f netcoreapp2.2 --filter Category=Dev /p:CollectCoverage=true  /p:CoverletOutput=../../CoverageResults/ /p:MergeWith="../../CoverageResults/coverage.json" /p:CoverletOutputFormat=\"opencover,json\" -m:1	
+RUN dotnet build  -c Release -f netcoreapp2.2 -o /app --no-restore 
+RUN dotnet sonarscanner end
+
+#FROM newtmitch/sonar-scanner AS sonar
+#ARG projectName=newproject
+#COPY src/. app
+#COPY --from=testrunner src/tests/CoverageResults/coverage.opencover.xml app/ 
+#RUN sonar-scanner -Dsonar.host.url=http://146.122.190.170:9000 -Dsonar.projectName=$projectName #-Dsonar.cs.opencover.reportsPaths=app/coverage.opencover.xml -Dsonar.coverage.exclusions=”**/tests/**/*” #-Dsonar.cs.file.suffixes=".cs"
+
+
+#FROM mcr.microsoft.com/dotnet/core/runtime:2.2 AS runtime
+#FROM microsoft/dotnet:2.2-aspnetcore-runtime AS runtime
+#EXPOSE 80
+#WORKDIR /app
+#COPY --from=build /app .
+#ENTRYPOINT ["dotnet", "CoverletSonarQubeDocker.dll"]

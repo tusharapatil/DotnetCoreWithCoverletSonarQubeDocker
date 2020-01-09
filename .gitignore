@@ -6,3 +6,7 @@
 /src/CoverletSonarQubeDocker/CoverletSonarQubeDocker/bin/
 /src/CoverletSonarQubeDocker/CoverletSonarQubeDocker/obj/
 /src/CoverletSonarQubeDocker/CoverletSonarQubeDocker/CoverletSonarQubeDocker.csproj.user
+/src/**/bin
+/src/**/obj
+/src/CoverletSonarQubeDocker/tests/CoverageResults
+/src/.vs/CoverletSonarQubeDocker
